@@ -14,41 +14,40 @@ func NewTransactionRepository() *InMemoryTransactionRepository {
 }
 
 var account domain.Account = domain.Account{Balance: 0, Transactions: nil}
-var mu sync.Mutex
+var mutex sync.Mutex
 
-func (repo *InMemoryTransactionRepository) Deposit(t domain.Transaction) domain.ApiResponse {
+func (repo *InMemoryTransactionRepository) Deposit(trnx *domain.Transaction) *domain.ApiResponse {
 	res := new(domain.ApiResponse)
 
-	mu.Lock()
-	account.Balance += (t.Amount - t.Surcharge)
-	mu.Unlock()
-	account.Transactions = append(account.Transactions, t)
+	mutex.Lock()
+	account.Balance += (trnx.Amount - trnx.Surcharge)
+	mutex.Unlock()
+	account.Transactions = append(account.Transactions, *trnx)
 
-	return res.Success("Deposit successful", t)
+	return res.Success("Deposit successful", trnx)
 }
 
-func (repo *InMemoryTransactionRepository) Withdraw(t domain.Transaction) domain.ApiResponse {
+func (repo *InMemoryTransactionRepository) Withdraw(trnx *domain.Transaction) *domain.ApiResponse {
 	res := new(domain.ApiResponse)
 
-	debitAmount := t.Amount + t.Surcharge
+	debitAmount := trnx.Amount + trnx.Surcharge
 	if account.Balance < debitAmount {
 		return res.Failure("Insufficient funds")
 	}
-	mu.Lock()
+	mutex.Lock()
 	account.Balance -= debitAmount
-	mu.Unlock()
-	account.Transactions = append(account.Transactions, t)
+	mutex.Unlock()
+	account.Transactions = append(account.Transactions, *trnx)
 
-	return res.Success("Withdrawal successful", t)
+	return res.Success("Withdrawal successful", trnx)
 }
 
-func (repo *InMemoryTransactionRepository) Balance() domain.ApiResponse {
+func (repo *InMemoryTransactionRepository) Balance() *domain.ApiResponse {
 	res := new(domain.ApiResponse)
 	return res.Success("Account Balance retrieved successfully", account.Balance)
 }
 
-func (repo *InMemoryTransactionRepository) TransactionHistory() domain.ApiResponse {
+func (repo *InMemoryTransactionRepository) TransactionHistory() *domain.ApiResponse {
 	res := new(domain.ApiResponse)
-
 	return res.Success("Transaction history retrieved successfully", account.Transactions)
 }

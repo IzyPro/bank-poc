@@ -9,7 +9,7 @@ type ApiResponse struct {
 	Code       string
 }
 
-func (res ApiResponse) Failure(msg string) ApiResponse {
+func (res *ApiResponse) Failure(msg string) *ApiResponse {
 	res.Code = utils.FailureResponseCode
 	res.Data = nil
 	res.Message = msg
@@ -18,7 +18,7 @@ func (res ApiResponse) Failure(msg string) ApiResponse {
 	return res
 }
 
-func (res ApiResponse) Success(msg string, data any) ApiResponse {
+func (res *ApiResponse) Success(msg string, data any) *ApiResponse {
 	res.Code = utils.SuccessResponseCode
 	res.Data = data
 	res.Message = msg

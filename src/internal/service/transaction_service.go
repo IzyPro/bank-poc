@@ -19,7 +19,7 @@ func NewTransactionService(repo *domain.TransactionRepository) *TransactionServi
 	}
 }
 
-func (s *TransactionService) Deposit(transactionDto domain.TransactionDto) domain.ApiResponse {
+func (service *TransactionService) Deposit(transactionDto *domain.TransactionDto) *domain.ApiResponse {
 	t := &domain.Transaction{
 		Id:              uuid.New().String(),
 		CreatedAt:       time.Now(),
@@ -38,10 +38,10 @@ func (s *TransactionService) Deposit(transactionDto domain.TransactionDto) domai
 		log.Println(valid)
 		return res.Failure(valid.Error())
 	}
-	return s.repo.Deposit(*t)
+	return service.repo.Deposit(t)
 }
 
-func (s *TransactionService) Withdraw(transactionDto domain.TransactionDto) domain.ApiResponse {
+func (service *TransactionService) Withdraw(transactionDto *domain.TransactionDto) *domain.ApiResponse {
 	t := &domain.Transaction{
 		Id:              uuid.New().String(),
 		CreatedAt:       time.Now(),
@@ -60,23 +60,20 @@ func (s *TransactionService) Withdraw(transactionDto domain.TransactionDto) doma
 		log.Println(valid)
 		return res.Failure(valid.Error())
 	}
-	return s.repo.Withdraw(*t)
+	return service.repo.Withdraw(t)
 }
 
-func (s *TransactionService) Balance() domain.ApiResponse {
+func (service *TransactionService) Balance() *domain.ApiResponse {
 	res := new(domain.ApiResponse)
 
-	balance := s.repo.Balance()
+	balance := service.repo.Balance()
 	if !balance.Successful || balance.Data == nil {
 		return balance
 	}
 
-	// account_balance.balance = fmt.Sprintf("%f", balance.Data)
-	// account_balance.timestamp = time.Now()
-
 	return res.Success("Account balance retrieved successfully", balance.Data)
 }
 
-func (s *TransactionService) TransactionHistory() domain.ApiResponse {
-	return s.repo.TransactionHistory()
+func (service *TransactionService) TransactionHistory() *domain.ApiResponse {
+	return service.repo.TransactionHistory()
 }

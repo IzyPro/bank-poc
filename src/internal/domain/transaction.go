@@ -23,14 +23,14 @@ type Transaction struct {
 	TransactionType utils.TransactionType
 }
 
-func (e Transaction) IsValid() error {
-	if len(e.Reference) < 1 {
+func (trnx Transaction) IsValid() error {
+	if len(trnx.Reference) < 1 {
 		return errors.New("reference cannot be empty")
 	}
-	if e.Amount <= 0 {
+	if trnx.Amount <= 0 {
 		return errors.New("amount must be greater than zero")
 	}
-	if e.Amount <= e.Surcharge {
+	if trnx.Amount <= trnx.Surcharge {
 		return errors.New("amount must be greater than transaction fee")
 	}
 
@@ -38,15 +38,15 @@ func (e Transaction) IsValid() error {
 }
 
 type TransactionRepository interface {
-	Deposit(t Transaction) ApiResponse
-	Withdraw(t Transaction) ApiResponse
-	Balance() ApiResponse
-	TransactionHistory() ApiResponse
+	Deposit(trnx *Transaction) *ApiResponse
+	Withdraw(trnx *Transaction) *ApiResponse
+	Balance() *ApiResponse
+	TransactionHistory() *ApiResponse
 }
 
 type TransactionService interface {
-	Deposit(t TransactionDto) ApiResponse
-	Withdraw(t TransactionDto) ApiResponse
-	Balance() ApiResponse
-	TransactionHistory() ApiResponse
+	Deposit(trnx *TransactionDto) *ApiResponse
+	Withdraw(trnx *TransactionDto) *ApiResponse
+	Balance() *ApiResponse
+	TransactionHistory() *ApiResponse
 }

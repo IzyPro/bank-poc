@@ -15,9 +15,9 @@ import (
 
 func main() {
 	repo := repository.New()
-	service := service.New(repo)
+	services := service.New(repo)
 
-	app := RunHttpServer(*service)
+	app := RunHttpServer(services)
 	http.Handle("/", app)
 
 	srv := &http.Server{
@@ -31,11 +31,11 @@ func main() {
 	log.Fatal(srv.ListenAndServe())
 }
 
-func RunHttpServer(service service.Service) *mux.Router {
+func RunHttpServer(services *service.Service) *mux.Router {
 	r := mux.NewRouter()
 	transactionRouter := r.PathPrefix("/transaction").Subrouter()
 	handler := &handlers.TransactionHandler{
-		Service: service.TransactionService,
+		TransactionService: services.TransactionService,
 	}
 	transactionRouter.HandleFunc("", handler.TransactionHistory).Methods("GET")
 	transactionRouter.HandleFunc("/balance", handler.Balance).Methods("GET")

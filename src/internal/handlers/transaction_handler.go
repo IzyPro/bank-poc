@@ -9,14 +9,14 @@ import (
 )
 
 type TransactionHandler struct {
-	Service domain.TransactionService
+	TransactionService domain.TransactionService
 }
 
-func (h *TransactionHandler) Deposit(w http.ResponseWriter, r *http.Request) {
+func (handler *TransactionHandler) Deposit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", utils.ContentTypeJSON)
 
-	var t domain.TransactionDto
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var trnx domain.TransactionDto
+	err := json.NewDecoder(r.Body).Decode(&trnx)
 	if err != nil {
 		apiResponse := new(domain.ApiResponse)
 		apiResponse.Failure(err.Error())
@@ -26,13 +26,13 @@ func (h *TransactionHandler) Deposit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := h.Service.Deposit(t)
+	res := handler.TransactionService.Deposit(&trnx)
 	jsonResp, err := json.Marshal(res)
 	if err != nil {
 		log.Printf("Error happened in JSON marshal. Err: %s", err)
 	}
-	if !res.Successful || res.Data == nil {
 
+	if !res.Successful || res.Data == nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(jsonResp)
 		return
@@ -42,11 +42,11 @@ func (h *TransactionHandler) Deposit(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
-func (h *TransactionHandler) Withdraw(w http.ResponseWriter, r *http.Request) {
+func (handler *TransactionHandler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", utils.ContentTypeJSON)
 
-	var t domain.TransactionDto
-	err := json.NewDecoder(r.Body).Decode(&t)
+	var trnx domain.TransactionDto
+	err := json.NewDecoder(r.Body).Decode(&trnx)
 	if err != nil {
 		apiResponse := new(domain.ApiResponse)
 		apiResponse.Failure(err.Error())
@@ -56,27 +56,7 @@ func (h *TransactionHandler) Withdraw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res := h.Service.Withdraw(t)
-	jsonResp, err := json.Marshal(res)
-	if err != nil {
-		log.Printf("Error happened in JSON marshal. Err: %s", err)
-	}
-
-	if !res.Successful || res.Data == nil {
-
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonResp)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResp)
-}
-
-func (h *TransactionHandler) Balance(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", utils.ContentTypeJSON)
-
-	res := h.Service.Balance()
+	res := handler.TransactionService.Withdraw(&trnx)
 	jsonResp, err := json.Marshal(res)
 	if err != nil {
 		log.Printf("Error happened in JSON marshal. Err: %s", err)
@@ -92,10 +72,29 @@ func (h *TransactionHandler) Balance(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
-func (h *TransactionHandler) TransactionHistory(w http.ResponseWriter, r *http.Request) {
+func (handler *TransactionHandler) Balance(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", utils.ContentTypeJSON)
 
-	res := h.Service.TransactionHistory()
+	res := handler.TransactionService.Balance()
+	jsonResp, err := json.Marshal(res)
+	if err != nil {
+		log.Printf("Error happened in JSON marshal. Err: %s", err)
+	}
+
+	if !res.Successful || res.Data == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(jsonResp)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResp)
+}
+
+func (handler *TransactionHandler) TransactionHistory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", utils.ContentTypeJSON)
+
+	res := handler.TransactionService.TransactionHistory()
 	jsonResp, err := json.Marshal(res)
 	if err != nil {
 		log.Printf("Error happened in JSON marshal. Err: %s", err)

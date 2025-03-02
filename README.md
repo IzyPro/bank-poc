@@ -8,7 +8,17 @@ Bank Account/Wallet proof-of-concept with the following features:
 
 • View transaction history
 
-## Deposit
+
+## Run
+
+Navigate to the `src/server` folder and run the following command:
+
+```bash
+go run .
+```
+
+
+### Deposit
 
 ##### POST /transaction/deposit
 
@@ -41,7 +51,7 @@ Response:
 ```
 
 
-## Withdrawal
+### Withdrawal
 
 ##### POST /transaction/withdraw
 
@@ -74,7 +84,7 @@ Response:
 ```
 
 
-## Retrieve Balance
+### Retrieve Balance
 
 ##### GET /transaction/balance
 
@@ -89,7 +99,7 @@ Response:
 ```
 
 
-## Retrieve Transactions
+### Retrieve Transactions
 
 ##### GET /transaction
 

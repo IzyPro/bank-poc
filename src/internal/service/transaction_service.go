@@ -77,3 +77,7 @@ func (service *TransactionService) Balance() *domain.ApiResponse {
 func (service *TransactionService) TransactionHistory() *domain.ApiResponse {
 	return service.repo.TransactionHistory()
 }
+
+func (service *TransactionService) Rollback() *domain.ApiResponse {
+	return service.repo.Rollback()
+}

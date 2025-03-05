@@ -30,6 +30,9 @@ func (trnx Transaction) IsValid() error {
 	if trnx.Amount <= 0 {
 		return errors.New("amount must be greater than zero")
 	}
+	if trnx.Surcharge < 0 {
+		return errors.New("surcharge must be greater than zero")
+	}
 	if trnx.Amount <= trnx.Surcharge {
 		return errors.New("amount must be greater than transaction fee")
 	}
@@ -42,6 +45,7 @@ type TransactionRepository interface {
 	Withdraw(trnx *Transaction) *ApiResponse
 	Balance() *ApiResponse
 	TransactionHistory() *ApiResponse
+	Rollback() *ApiResponse
 }
 
 type TransactionService interface {
@@ -49,4 +53,5 @@ type TransactionService interface {
 	Withdraw(trnx *TransactionDto) *ApiResponse
 	Balance() *ApiResponse
 	TransactionHistory() *ApiResponse
+	Rollback() *ApiResponse
 }

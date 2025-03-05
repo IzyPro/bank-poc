@@ -41,6 +41,7 @@ func RunHttpServer(services *service.Service) *mux.Router {
 	transactionRouter.HandleFunc("/balance", handler.Balance).Methods("GET")
 	transactionRouter.HandleFunc("/deposit", handler.Deposit).Methods("POST")
 	transactionRouter.HandleFunc("/withdraw", handler.Withdraw).Methods("POST")
+	transactionRouter.HandleFunc("/rollback", handler.Rollback).Methods("POST")
 	r.HandleFunc("/", PingHandler)
 	return r
 }

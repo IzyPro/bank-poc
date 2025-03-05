@@ -109,3 +109,22 @@ func (handler *TransactionHandler) TransactionHistory(w http.ResponseWriter, r *
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResp)
 }
+
+func (handler *TransactionHandler) Rollback(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", utils.ContentTypeJSON)
+
+	res := handler.TransactionService.Rollback()
+	jsonResp, err := json.Marshal(res)
+	if err != nil {
+		log.Printf("Error happened in JSON marshal. Err: %s", err)
+	}
+
+	if !res.Successful || res.Data == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(jsonResp)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResp)
+}

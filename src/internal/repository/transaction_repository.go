@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bank-poc/src/internal/domain"
+	utils "bank-poc/src/internal/utils/enums"
 	"sync"
 )
 
@@ -31,10 +32,13 @@ func (repo *InMemoryTransactionRepository) Withdraw(trnx *domain.Transaction) *d
 	res := new(domain.ApiResponse)
 
 	debitAmount := trnx.Amount + trnx.Surcharge
+
+	mutex.Lock()
+	// Retrieve balance from db
 	if account.Balance < debitAmount {
 		return res.Failure("Insufficient funds")
 	}
-	mutex.Lock()
+
 	account.Balance -= debitAmount
 	mutex.Unlock()
 	account.Transactions = append(account.Transactions, *trnx)
@@ -50,4 +54,24 @@ func (repo *InMemoryTransactionRepository) Balance() *domain.ApiResponse {
 func (repo *InMemoryTransactionRepository) TransactionHistory() *domain.ApiResponse {
 	res := new(domain.ApiResponse)
 	return res.Success("Transaction history retrieved successfully", account.Transactions)
+}
+
+func (repo *InMemoryTransactionRepository) Rollback() *domain.ApiResponse {
+	res := new(domain.ApiResponse)
+
+	if len(account.Transactions) < 1 {
+		return res.Failure("Transaction list is empty")
+	}
+
+	lastTrnxIndex := len(account.Transactions) - 1
+	trnx := account.Transactions[lastTrnxIndex]
+
+	account.Transactions = account.Transactions[:lastTrnxIndex]
+	if trnx.TransactionType == utils.Credit {
+		account.Balance -= (trnx.Amount - trnx.Surcharge)
+	} else {
+		account.Balance += (trnx.Amount + trnx.Surcharge)
+	}
+
+	return res.Success("Rollback successful", trnx)
 }
